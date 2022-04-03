@@ -168,3 +168,43 @@ plt.savefig('grid_python.eps')
 
 
 plt.show()
+
+#  Q1.4
+
+duudx,duudy = dphidx_dy(xf2d,yf2d,uu2d)
+duudx_dx,duudx_dy = dphidx_dy(xf2d,yf2d,duudx)
+duudy_dx,duudy_dy = dphidx_dy(xf2d,yf2d,duudy)
+
+dvvdx,dvvdy = dphidx_dy(xf2d,yf2d,vv2d)
+
+duvdx,duvdy = dphidx_dy(xf2d,yf2d,uv2d)
+duvdx_dx,duvdx_dy = dphidx_dy(xf2d,yf2d,duvdx)
+duvdy_dx,duvdy_dy = dphidx_dy(xf2d,yf2d,duvdy)
+
+C_nu = 0.09
+C1 = 1.5
+C2 = 0.6
+C1_w = 0.5
+C2_w = 0.3
+sig_k = 1
+rho = 1
+
+x_pos = 10
+
+i = 1
+j = 1
+mu = 1/10595
+visc_diff_11 = mu*(np.add(duudx_dx, duudy_dy))
+P_11 = -2*np.add(np.multiply(uu2d, dudx), np.multiply(uv2d, dudy))
+P_strain = 0
+
+i = 1
+j = 2
+mu = 1/10595
+visc_diff_12 = mu*(np.add(duvdx_dx, duvdy_dy))
+P_12 = -np.add(np.add(np.multiply(uu2d, dvdx), np.multiply(uv2d, dvdy)), np.add(np.multiply(uv2d, dudx), np.multiply(vv2d, dudy)))
+P_strain_12_2 = -C2*rho*P_12
+eps = diss_RANS_2d
+
+P_strain_12 = P_strain_12_2*(1-3/2*C2_w*f) - 3/2*C1_w*eps/k*uv2d*f - C1*rho*eps/k2d*uv2d
+
