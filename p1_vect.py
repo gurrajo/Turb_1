@@ -249,3 +249,28 @@ duvdy_eddy_dx, duvdy_eddy_dy = dphidx_dy(xf2d,yf2d,duvdy_eddy)
 D_12 = np.add(duvdx_eddy_dx, duvdy_eddy_dy)
 
 eps_12 = 0
+
+# 1.8:
+bouss_11 = np.zeros((ni,nj))
+bouss_12 = np.zeros((ni,nj))
+S_11 = dudx
+S_12 = 1/2*np.add(dudy, dvdx)
+for i in range(ni):
+    for j in range(nj):
+        bouss_11[i, j] = -2*C_nu*k_RANS_2d[i, j]**2/eps[i, j]*S_11[i, j] + k_RANS_2d[i, j]*2/3
+        bouss_12[i, j] = -2 * C_nu * k_RANS_2d[i, j] ** 2 / eps[i, j] * S_12[i, j]
+
+
+# 1.9:
+P_k = -np.add(np.add(np.multiply(uu2d, dudx), np.multiply(uv2d, dudy)), np.add(np.multiply(vv2d, dvdy), np.multiply(uv2d, dvdx)))
+
+# 1.10:
+S_22 = dvdx
+for i in range(ni):
+    for j in range(nj):
+        S = np.zeros((2, 2))
+        S[0, 0] = S_11[i, j]
+        S[0, 1] = S_12[i, j]
+        S[1, 0] = S_12[i, j]
+        S[1, 1] = S_22[i, j]
+
