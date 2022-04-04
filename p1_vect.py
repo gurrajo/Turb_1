@@ -167,7 +167,6 @@ plt.title('grid')
 plt.savefig('grid_python.eps')
 
 
-plt.show()
 
 #  Q1.4
 
@@ -266,6 +265,7 @@ P_k = -np.add(np.add(np.multiply(uu2d, dudx), np.multiply(uv2d, dudy)), np.add(n
 
 # 1.10:
 S_22 = dvdx
+lam_1 = np.zeros((ni,nj))
 for i in range(ni):
     for j in range(nj):
         S = np.zeros((2, 2))
@@ -273,4 +273,18 @@ for i in range(ni):
         S[0, 1] = S_12[i, j]
         S[1, 0] = S_12[i, j]
         S[1, 1] = S_22[i, j]
+        W, v = np.linalg.eig(S)
+        lam_1[i, j] = W[0]
+upper_lim = np.divide(k_RANS_2d, (3*np.abs(lam_1)))
+nu_t_limit = np.clip(vist_RANS_2d, None, upper_lim)
+limit_effect = np.subtract(vist_RANS_2d, nu_t_limit)
 
+fig1,ax1 = plt.subplots()
+plt.subplots_adjust(left=0.20,bottom=0.20)
+plt.contourf(x2d,y2d,limit_effect, 50)
+plt.xlabel("$x$")
+plt.ylabel("$y$")
+plt.title("contour k RANS plot")
+plt.savefig('limit_effect.png')
+
+plt.show()
