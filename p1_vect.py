@@ -190,6 +190,7 @@ sig_k = 1
 rho = 1
 
 x_pos = 10
+eps = diss_RANS_2d
 
 i = 1
 j = 1
@@ -198,13 +199,53 @@ visc_diff_11 = mu*(np.add(duudx_dx, duudy_dy))
 P_11 = -2*np.add(np.multiply(uu2d, dudx), np.multiply(uv2d, dudy))
 P_strain = 0
 
+duudx_eddy = np.zeros((ni,nj))
+duudy_eddy = np.zeros((ni,nj))
+for i in range(ni):
+    for j in range(nj):
+        duudx_eddy[i, j] = duudx[i, j] * (C_nu * k_RANS_2d[i, j] ** 2 / (eps[i, j] * sig_k))
+        duudy_eddy[i, j] = duudy[i, j] * (C_nu * k_RANS_2d[i, j] ** 2 / (eps[i, j] * sig_k))
+
+duudx_eddy_dx, duudx_eddy_dy = dphidx_dy(xf2d,yf2d,duudx_eddy)
+duudy_eddy_dx, duudy_eddy_dy = dphidx_dy(xf2d,yf2d,duudy_eddy)
+
+D_11 = np.add(duudx_eddy_dx, duudy_eddy_dy)
+eps_11 = 2/3*eps
 i = 1
 j = 2
 mu = 1/10595
 visc_diff_12 = mu*(np.add(duvdx_dx, duvdy_dy))
 P_12 = -np.add(np.add(np.multiply(uu2d, dvdx), np.multiply(uv2d, dvdy)), np.add(np.multiply(uv2d, dudx), np.multiply(vv2d, dudy)))
 P_strain_12_2 = -C2*rho*P_12
-eps = diss_RANS_2d
 
-P_strain_12 = P_strain_12_2*(1-3/2*C2_w*f) - 3/2*C1_w*eps/k*uv2d*f - C1*rho*eps/k2d*uv2d
+def n_i(x,y):
+    dist = np.zeros((ni, 2))
+    for i in range(ni):
+        dist[i, 0] = np.sqrt((x-x2d[i, 0])**2 + (y-y2d[i, 0])**2)
+        dist[i, 1] = np.sqrt((x - x2d[i, -1]) ** 2 + (y - y2d[i, -1]) ** 2)
+    return np.min(dist)
 
+f = np.zeros((nj,1))
+P_strain_12 = np.zeros((nj, 1))
+for j in range(nj):
+    if j == 0 or j == nj-1:
+        f[j] = 1
+    else:
+        dist = n_i(x2d[x_pos, j], y2d[x_pos, j])
+        f[j] = np.min([k_RANS_2d[x_pos, j]**(3/2)/(2.55*dist*eps[x_pos, j]), 1])
+
+    P_strain_12[j] = P_strain_12_2[x_pos,j]*(1-3/2*C2_w*f[j]) - 3/2*C1_w*eps[x_pos, j]/k_RANS_2d[x_pos, j]*uv2d[x_pos, j]*f[j] - C1*rho*eps[x_pos,j]/k_RANS_2d[x_pos,j]*uv2d[x_pos,j]
+
+duvdx_eddy = np.zeros((ni, nj))
+duvdy_eddy = np.zeros((ni, nj))
+for i in range(ni):
+    for j in range(nj):
+        duvdx_eddy[i, j] = duvdx[i, j] * (C_nu * k_RANS_2d[i, j] ** 2 / (eps[i, j] * sig_k))
+        duvdy_eddy[i, j] = duvdy[i, j] * (C_nu * k_RANS_2d[i, j] ** 2 / (eps[i, j] * sig_k))
+
+duvdx_eddy_dx, duvdx_eddy_dy = dphidx_dy(xf2d,yf2d,duvdx_eddy)
+duvdy_eddy_dx, duvdy_eddy_dy = dphidx_dy(xf2d,yf2d,duvdy_eddy)
+
+D_12 = np.add(duvdx_eddy_dx, duvdy_eddy_dy)
+
+eps_12 = 0
