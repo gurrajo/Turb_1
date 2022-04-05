@@ -210,6 +210,18 @@ duudy_eddy_dx, duudy_eddy_dy = dphidx_dy(xf2d,yf2d,duudy_eddy)
 
 D_11 = np.add(duudx_eddy_dx, duudy_eddy_dy)
 eps_11 = 2/3*eps
+fig1,ax1 = plt.subplots()
+plt.subplots_adjust(left=0.20,bottom=0.20)
+plt.plot(visc_diff_11[x_pos, :], y2d[x_pos, :])
+plt.plot(P_11[x_pos, :], y2d[x_pos, :])
+plt.plot(D_11[x_pos, :], y2d[x_pos, :])
+plt.plot(eps_11[x_pos, :], y2d[x_pos, :])
+plt.xlabel("$stress terms$")
+plt.ylabel("$y$")
+plt.title("all raynolds stress terms for i=j=1")
+plt.savefig('stresses_11.png')
+
+
 i = 1
 j = 2
 mu = 1/10595
@@ -233,7 +245,7 @@ for j in range(nj):
         dist = n_i(x2d[x_pos, j], y2d[x_pos, j])
         f[j] = np.min([k_RANS_2d[x_pos, j]**(3/2)/(2.55*dist*eps[x_pos, j]), 1])
 
-    P_strain_12[j] = P_strain_12_2[x_pos,j]*(1-3/2*C2_w*f[j]) - 3/2*C1_w*eps[x_pos, j]/k_RANS_2d[x_pos, j]*uv2d[x_pos, j]*f[j] - C1*rho*eps[x_pos,j]/k_RANS_2d[x_pos,j]*uv2d[x_pos,j]
+    P_strain_12[j] = P_strain_12_2[x_pos,j]*(1-(3/2)*C2_w*f[j]) - (3/2)*(C1_w*eps[x_pos, j]/k_RANS_2d[x_pos, j])*uv2d[x_pos, j]*f[j] - (C1*rho*eps[x_pos,j]/k_RANS_2d[x_pos,j])*uv2d[x_pos,j]
 
 duvdx_eddy = np.zeros((ni, nj))
 duvdy_eddy = np.zeros((ni, nj))
@@ -248,6 +260,17 @@ duvdy_eddy_dx, duvdy_eddy_dy = dphidx_dy(xf2d,yf2d,duvdy_eddy)
 D_12 = np.add(duvdx_eddy_dx, duvdy_eddy_dy)
 
 eps_12 = 0
+fig1,ax1 = plt.subplots()
+plt.subplots_adjust(left=0.20,bottom=0.20)
+plt.plot(visc_diff_12[x_pos, :], y2d[x_pos, :])
+plt.plot(P_12[x_pos, :], y2d[x_pos, :])
+plt.plot(D_12[x_pos, :], y2d[x_pos, :])
+plt.plot(P_strain_12, y2d[x_pos, :])
+plt.xlabel("$stress terms$")
+plt.ylabel("$y$")
+plt.title("all raynolds stress terms for i=1, j=2")
+plt.legend(['Visc_diff','Production','Turb_diff','Press_strain'])
+plt.savefig('stresses_11.png')
 
 # 1.8:
 bouss_11 = np.zeros((ni,nj))
