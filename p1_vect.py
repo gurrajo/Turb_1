@@ -1,6 +1,7 @@
 import scipy.io as sio
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 from dphidx_dy import dphidx_dy
 
 plt.rcParams.update({'font.size': 22})
@@ -211,15 +212,26 @@ duudy_eddy_dx, duudy_eddy_dy = dphidx_dy(xf2d,yf2d,duudy_eddy)
 D_11 = np.add(duudx_eddy_dx, duudy_eddy_dy)
 eps_11 = 2/3*eps
 fig1,ax1 = plt.subplots()
-plt.subplots_adjust(left=0.20,bottom=0.20)
 plt.plot(visc_diff_11[x_pos, :], y2d[x_pos, :])
 plt.plot(P_11[x_pos, :], y2d[x_pos, :])
 plt.plot(D_11[x_pos, :], y2d[x_pos, :])
 plt.plot(eps_11[x_pos, :], y2d[x_pos, :])
-plt.xlabel("$stress terms$")
 plt.ylabel("$y$")
-plt.title("all raynolds stress terms for i=j=1")
-plt.savefig('stresses_11.png')
+plt.title("all Reynolds stress terms for i=j=1", fontsize=15)
+plt.legend(['Visc_diff','Production','Turb_diff','Dissipation'],prop={'size': 6})
+plt.savefig('stresses_11.eps')
+
+fig1,ax1 = plt.subplots()
+plt.plot(visc_diff_11[x_pos, :], y2d[x_pos, :])
+plt.plot(P_11[x_pos, :], y2d[x_pos, :])
+plt.plot(D_11[x_pos, :], y2d[x_pos, :])
+plt.plot(eps_11[x_pos, :], y2d[x_pos, :])
+plt.ylim([0,0.05])
+plt.xlim([-0.5,0.5])
+plt.ylabel("$y$")
+plt.title("all Reynolds stress terms for i=j=1", fontsize=15)
+plt.legend(['Visc_diff','Production','Turb_diff','Dissipation'],prop={'size': 6})
+plt.savefig('stresses_11_zoomed.eps')
 
 
 i = 1
@@ -261,16 +273,27 @@ D_12 = np.add(duvdx_eddy_dx, duvdy_eddy_dy)
 
 eps_12 = 0
 fig1,ax1 = plt.subplots()
-plt.subplots_adjust(left=0.20,bottom=0.20)
 plt.plot(visc_diff_12[x_pos, :], y2d[x_pos, :])
 plt.plot(P_12[x_pos, :], y2d[x_pos, :])
 plt.plot(D_12[x_pos, :], y2d[x_pos, :])
 plt.plot(P_strain_12, y2d[x_pos, :])
-plt.xlabel("$stress terms$")
 plt.ylabel("$y$")
-plt.title("all raynolds stress terms for i=1, j=2")
-plt.legend(['Visc_diff','Production','Turb_diff','Press_strain'])
-plt.savefig('stresses_11.png')
+plt.title("all Reynolds stress terms for i=1, j=2", fontsize=15)
+plt.legend(['Visc_diff','Production','Turb_diff','Press_strain'],prop={'size': 6})
+plt.savefig('stresses_12.eps')
+
+fig1,ax1 = plt.subplots()
+plt.plot(visc_diff_12[x_pos, :], y2d[x_pos, :])
+plt.plot(P_12[x_pos, :], y2d[x_pos, :])
+plt.plot(D_12[x_pos, :], y2d[x_pos, :])
+plt.plot(P_strain_12, y2d[x_pos, :])
+plt.ylim([0,0.05])
+plt.xlim([-0.5,0.5])
+plt.ylabel("$y$")
+plt.title("all Reynolds stress terms for i=1, j=2", fontsize=15)
+plt.legend(['Visc_diff','Production','Turb_diff','Press_strain'],prop={'size': 6})
+plt.savefig('stresses_12_zoomed.eps')
+
 
 # 1.8:
 bouss_11 = np.zeros((ni,nj))
@@ -281,10 +304,36 @@ for i in range(ni):
     for j in range(nj):
         bouss_11[i, j] = -2*C_nu*k_RANS_2d[i, j]**2/eps[i, j]*S_11[i, j] + k_RANS_2d[i, j]*2/3
         bouss_12[i, j] = -2 * C_nu * k_RANS_2d[i, j] ** 2 / eps[i, j] * S_12[i, j]
+fig1,ax1 = plt.subplots()
+plt.plot(bouss_11[x_pos, :], y2d[x_pos, :])
+plt.plot(bouss_12[x_pos, :], y2d[x_pos, :])
+plt.ylabel("$y$")
+plt.title("Stresses", fontsize=15)
+plt.legend(['Bouss_11','Bouss_12'],prop={'size': 6})
+plt.savefig('bouss_stresses.eps')
 
+fig1,ax1 = plt.subplots()
+plt.plot(bouss_11[x_pos, :], y2d[x_pos, :])
+plt.plot(bouss_12[x_pos, :], y2d[x_pos, :])
+plt.ylim([0,0.2])
+plt.xlim([-0.5,0.5])
+plt.ylabel("$y$")
+plt.title("Stresses", fontsize=15)
+plt.legend(['Bouss_11','Bouss_12'],prop={'size': 6})
+plt.savefig('bouss_stresses_zoom.eps')
 
 # 1.9:
 P_k = -np.add(np.add(np.multiply(uu2d, dudx), np.multiply(uv2d, dudy)), np.add(np.multiply(vv2d, dvdy), np.multiply(uv2d, dvdx)))
+fig1,ax1 = plt.subplots()
+ax1.set_facecolor((0,0,0))
+plt.subplots_adjust(left=0.20,bottom=0.20)
+plt.contourf(x2d,y2d,P_k, levels=np.linspace(-0.1, -0.0001, 20))
+plt.xlabel("$x$")
+plt.ylabel("$y$")
+plt.title("Production plot", fontsize=15)
+cbar = plt.colorbar(fraction=0.046, pad=0.04)
+cbar.ax.tick_params(labelsize=7)
+plt.savefig('Pk.eps')
 
 # 1.10:
 S_22 = dvdx
@@ -307,7 +356,9 @@ plt.subplots_adjust(left=0.20,bottom=0.20)
 plt.contourf(x2d,y2d,limit_effect, 50)
 plt.xlabel("$x$")
 plt.ylabel("$y$")
-plt.title("contour k RANS plot")
-plt.savefig('limit_effect.png')
+plt.title("contour limit effect plot", fontsize=15)
+cbar = plt.colorbar(fraction=0.046, pad=0.04)
+cbar.ax.tick_params(labelsize=9)
+plt.savefig('limit_effect.eps')
 
 plt.show()
