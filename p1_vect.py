@@ -218,8 +218,11 @@ for i in range(ni):
 duudx_eddy_dx, duudx_eddy_dy = dphidx_dy(xf2d,yf2d,duudx_eddy)
 duudy_eddy_dx, duudy_eddy_dy = dphidx_dy(xf2d,yf2d,duudy_eddy)
 
+
 D_11 = np.add(duudx_eddy_dx, duudy_eddy_dy)
-eps_11 = 2/3*eps
+eps_11 = -2/3*eps
+sum_terms_11 = visc_diff_11+P_11+D_11+eps_11
+
 fig1,ax1 = plt.subplots()
 plt.plot(visc_diff_11[x_pos, :], y2d[x_pos, :])
 plt.plot(P_11[x_pos, :], y2d[x_pos, :])
@@ -281,6 +284,7 @@ duvdy_eddy_dx, duvdy_eddy_dy = dphidx_dy(xf2d,yf2d,duvdy_eddy)
 D_12 = np.add(duvdx_eddy_dx, duvdy_eddy_dy)
 
 eps_12 = 0
+sum_terms_12 = visc_diff_12[x_pos, :] + P_12[x_pos, :] + D_12[x_pos, :] + np.transpose(P_strain_12)
 fig1,ax1 = plt.subplots()
 plt.plot(visc_diff_12[x_pos, :], y2d[x_pos, :])
 plt.plot(P_12[x_pos, :], y2d[x_pos, :])
@@ -304,6 +308,9 @@ plt.legend(['Visc_diff','Production','Turb_diff','Press_strain'],prop={'size': 6
 plt.savefig('stresses_12_zoomed.eps')
 
 
+
+
+
 # 1.8:
 bouss_11 = np.zeros((ni,nj))
 bouss_12 = np.zeros((ni,nj))
@@ -319,9 +326,11 @@ plt.plot(bouss_11[x_pos, :], y2d[x_pos, :])
 plt.plot(bouss_12[x_pos, :], y2d[x_pos, :])
 plt.plot(rey_stress_11[x_pos, :], y2d[x_pos, :])
 plt.plot(rey_stress_12[x_pos, :], y2d[x_pos, :])
+plt.plot(sum_terms_11[x_pos, :], y2d[x_pos, :])
+plt.plot(np.transpose(sum_terms_12), y2d[x_pos, :])
 plt.ylabel("$y$")
 plt.title("Stresses", fontsize=15)
-plt.legend(['Bouss_11','Bouss_12', 'rey_stress_11', 'rey_stress_12'], prop={'size': 6})
+plt.legend(['Bouss_11','Bouss_12', 'rey_stress_11', 'rey_stress_12', 'sum_terms_11', 'sum_terms_12'], prop={'size': 6})
 plt.savefig('bouss_stresses.eps')
 
 fig1,ax1 = plt.subplots()
@@ -329,11 +338,13 @@ plt.plot(bouss_11[x_pos, :], y2d[x_pos, :])
 plt.plot(bouss_12[x_pos, :], y2d[x_pos, :])
 plt.plot(rey_stress_11[x_pos, :], y2d[x_pos, :])
 plt.plot(rey_stress_12[x_pos, :], y2d[x_pos, :])
+plt.plot(sum_terms_11[x_pos, :], y2d[x_pos, :])
+plt.plot(np.transpose(sum_terms_12), y2d[x_pos, :])
 plt.ylim([0,0.2])
 plt.xlim([-0.5,0.5])
 plt.ylabel("$y$")
 plt.title("Stresses", fontsize=15)
-plt.legend(['Bouss_11', 'Bouss_12', 'rey_stress_11', 'rey_stress_12'], prop={'size': 6})
+plt.legend(['Bouss_11', 'Bouss_12', 'rey_stress_11', 'rey_stress_12', 'sum_terms_11', 'sum_terms_12'], prop={'size': 6})
 plt.savefig('bouss_stresses_zoom.eps')
 
 # 1.9:
