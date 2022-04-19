@@ -171,6 +171,15 @@ plt.savefig('grid_python.eps')
 
 #  Q1.4
 
+duuudx, duuudy = dphidx_dy(xf2d, yf2d, uu2d*u2d)
+duuvdx, duuvdy = dphidx_dy(xf2d, yf2d, uu2d*v2d)
+
+duvudx, duvudy = dphidx_dy(xf2d, yf2d, uv2d*u2d)
+duvvdx, duvvdy = dphidx_dy(xf2d, yf2d, uv2d*v2d)
+
+rey_stress_11 = np.add(duuudx, duuvdy)
+rey_stress_12 = np.add(duvudx, duvvdy)
+
 duudx,duudy = dphidx_dy(xf2d,yf2d,uu2d)
 duudx_dx,duudx_dy = dphidx_dy(xf2d,yf2d,duudx)
 duudy_dx,duudy_dy = dphidx_dy(xf2d,yf2d,duudy)
@@ -304,22 +313,27 @@ for i in range(ni):
     for j in range(nj):
         bouss_11[i, j] = -2*C_nu*k_RANS_2d[i, j]**2/eps[i, j]*S_11[i, j] + k_RANS_2d[i, j]*2/3
         bouss_12[i, j] = -2 * C_nu * k_RANS_2d[i, j] ** 2 / eps[i, j] * S_12[i, j]
+
 fig1,ax1 = plt.subplots()
 plt.plot(bouss_11[x_pos, :], y2d[x_pos, :])
 plt.plot(bouss_12[x_pos, :], y2d[x_pos, :])
+plt.plot(rey_stress_11[x_pos, :], y2d[x_pos, :])
+plt.plot(rey_stress_12[x_pos, :], y2d[x_pos, :])
 plt.ylabel("$y$")
 plt.title("Stresses", fontsize=15)
-plt.legend(['Bouss_11','Bouss_12'],prop={'size': 6})
+plt.legend(['Bouss_11','Bouss_12', 'rey_stress_11', 'rey_stress_12'], prop={'size': 6})
 plt.savefig('bouss_stresses.eps')
 
 fig1,ax1 = plt.subplots()
 plt.plot(bouss_11[x_pos, :], y2d[x_pos, :])
 plt.plot(bouss_12[x_pos, :], y2d[x_pos, :])
+plt.plot(rey_stress_11[x_pos, :], y2d[x_pos, :])
+plt.plot(rey_stress_12[x_pos, :], y2d[x_pos, :])
 plt.ylim([0,0.2])
 plt.xlim([-0.5,0.5])
 plt.ylabel("$y$")
 plt.title("Stresses", fontsize=15)
-plt.legend(['Bouss_11','Bouss_12'],prop={'size': 6})
+plt.legend(['Bouss_11', 'Bouss_12', 'rey_stress_11', 'rey_stress_12'], prop={'size': 6})
 plt.savefig('bouss_stresses_zoom.eps')
 
 # 1.9:
