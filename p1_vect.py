@@ -116,57 +116,6 @@ dvdy= np.zeros((ni,nj))
 dudx,dudy=dphidx_dy(xf2d,yf2d,u2d)
 dvdx,dvdy=dphidx_dy(xf2d,yf2d,v2d)
 
-################################ vector plot
-fig1,ax1 = plt.subplots()
-plt.subplots_adjust(left=0.20,bottom=0.20)
-k=6# plot every forth vector
-ss=3.2 #vector length
-plt.quiver(x2d[::k,::k],y2d[::k,::k],u2d[::k,::k],v2d[::k,::k],width=0.01)
-plt.xlabel("$x$")
-plt.ylabel("$y$")
-plt.title("vector plot")
-plt.savefig('vect_python.eps')
-
-################################ contour plot
-fig1,ax1 = plt.subplots()
-plt.subplots_adjust(left=0.20,bottom=0.20)
-plt.xlabel("$x$")
-plt.ylabel("$y$")
-plt.title("contour pressure plot")
-plt.savefig('piso_python.eps')
-
-################################ contour plot
-fig1,ax1 = plt.subplots()
-plt.subplots_adjust(left=0.20,bottom=0.20)
-plt.contourf(x2d,y2d,k_RANS_2d, 50)
-plt.xlabel("$x$")
-plt.ylabel("$y$")
-plt.title("contour k RANS plot")
-plt.savefig('k_rans.eps')
-
-#************
-# plot uv
-fig1,ax1 = plt.subplots()
-plt.subplots_adjust(left=0.20,bottom=0.20)
-i=10
-plt.plot(uv2d[i,:],y2d[i,:],'b-')
-plt.xlabel('$\overline{u^\prime v^\prime}$')
-plt.ylabel('y/H')
-plt.savefig('uv_python.eps')
-
-#%%%%%%%%%%%%%%%%%%%%% grid
-fig1,ax1 = plt.subplots()
-plt.subplots_adjust(left=0.20,bottom=0.20)
-for i in range (0,ni):
-   plt.plot(x2d[i,:],y2d[i,:])
-
-for j in range (0,nj):
-   plt.plot(x2d[:,j],y2d[:,j])
-
-#plt.axis([0,5,0,5])
-plt.title('grid')
-plt.savefig('grid_python.eps')
-
 
 
 #  Q1.4
@@ -230,7 +179,8 @@ plt.plot(D_11[x_pos, :], y2d[x_pos, :])
 plt.plot(eps_11[x_pos, :], y2d[x_pos, :])
 plt.ylabel("$y$")
 plt.title("all Reynolds stress terms for i=j=1", fontsize=15)
-plt.legend(['Visc_diff','Production','Turb_diff','Dissipation'],prop={'size': 6})
+plt.legend(['Visc_diff','Production','Turb_diff','Dissipation'],prop={'size': 10})
+plt.grid()
 plt.savefig('stresses_11.eps')
 
 fig1,ax1 = plt.subplots()
@@ -239,10 +189,11 @@ plt.plot(P_11[x_pos, :], y2d[x_pos, :])
 plt.plot(D_11[x_pos, :], y2d[x_pos, :])
 plt.plot(eps_11[x_pos, :], y2d[x_pos, :])
 plt.ylim([0,0.05])
-plt.xlim([-0.5,0.5])
+plt.xlim([-0.05,0.05])
 plt.ylabel("$y$")
 plt.title("all Reynolds stress terms for i=j=1", fontsize=15)
-plt.legend(['Visc_diff','Production','Turb_diff','Dissipation'],prop={'size': 6})
+plt.legend(['Visc_diff','Production','Turb_diff','Dissipation'],prop={'size': 8})
+plt.grid()
 plt.savefig('stresses_11_zoomed.eps')
 
 
@@ -250,7 +201,8 @@ i = 1
 j = 2
 mu = 1/10595
 visc_diff_12 = mu*(np.add(duvdx_dx, duvdy_dy))
-P_12 = -np.add(np.add(np.multiply(uu2d, dvdx), np.multiply(uv2d, dvdy)), np.add(np.multiply(uv2d, dudx), np.multiply(vv2d, dudy)))
+P_12_temp = -np.add(np.add(np.multiply(uu2d, dvdx), np.multiply(uv2d, dvdy)), np.add(np.multiply(uv2d, dudx), np.multiply(vv2d, dudy)))
+P_12 = -(uu2d*dvdx + uv2d*dvdy) - (uv2d*dudx + vv2d*dudy)
 P_strain_12_2 = -C2*rho*P_12
 
 def n_i(x,y):
@@ -293,6 +245,7 @@ plt.plot(P_strain_12, y2d[x_pos, :])
 plt.ylabel("$y$")
 plt.title("all Reynolds stress terms for i=1, j=2", fontsize=15)
 plt.legend(['Visc_diff','Production','Turb_diff','Press_strain'],prop={'size': 6})
+plt.grid()
 plt.savefig('stresses_12.eps')
 
 fig1,ax1 = plt.subplots()
@@ -301,10 +254,11 @@ plt.plot(P_12[x_pos, :], y2d[x_pos, :])
 plt.plot(D_12[x_pos, :], y2d[x_pos, :])
 plt.plot(P_strain_12, y2d[x_pos, :])
 plt.ylim([0,0.05])
-plt.xlim([-0.5,0.5])
+plt.xlim([-0.05,0.05])
 plt.ylabel("$y$")
 plt.title("all Reynolds stress terms for i=1, j=2", fontsize=15)
 plt.legend(['Visc_diff','Production','Turb_diff','Press_strain'],prop={'size': 6})
+plt.grid()
 plt.savefig('stresses_12_zoomed.eps')
 
 
@@ -321,31 +275,42 @@ for i in range(ni):
         bouss_11[i, j] = -2*C_nu*k_RANS_2d[i, j]**2/eps[i, j]*S_11[i, j] + k_RANS_2d[i, j]*2/3
         bouss_12[i, j] = -2 * C_nu * k_RANS_2d[i, j] ** 2 / eps[i, j] * S_12[i, j]
 
+bouss_duuudx, bouss_duuudy = dphidx_dy(xf2d, yf2d, uu2d*u2d)
+bouss_duuvdx, bouss_duuvdy = dphidx_dy(xf2d, yf2d, uu2d*v2d)
+
+bouss_duvudx, bouss_duvudy = dphidx_dy(xf2d, yf2d, uv2d*u2d)
+bouss_duvvdx, bouss_duvvdy = dphidx_dy(xf2d, yf2d, uv2d*v2d)
+
+bouss_stress_11 = np.add(bouss_duuudx, bouss_duuvdy)
+bouss_stress_12 = np.add(bouss_duvudx, bouss_duvvdy)
+
 fig1,ax1 = plt.subplots()
-plt.plot(bouss_11[x_pos, :], y2d[x_pos, :])
-plt.plot(bouss_12[x_pos, :], y2d[x_pos, :])
+plt.plot(bouss_stress_11[x_pos, :], y2d[x_pos, :])
+plt.plot(bouss_stress_12[x_pos, :], y2d[x_pos, :])
 plt.plot(rey_stress_11[x_pos, :], y2d[x_pos, :])
 plt.plot(rey_stress_12[x_pos, :], y2d[x_pos, :])
-plt.plot(sum_terms_11[x_pos, :], y2d[x_pos, :])
-plt.plot(np.transpose(sum_terms_12), y2d[x_pos, :])
+#plt.plot(sum_terms_11[x_pos, :], y2d[x_pos, :])
+#plt.plot(np.transpose(sum_terms_12), y2d[x_pos, :])
 plt.ylabel("$y$")
 plt.title("Stresses", fontsize=15)
 plt.legend(['Bouss_11','Bouss_12', 'rey_stress_11', 'rey_stress_12', 'sum_terms_11', 'sum_terms_12'], prop={'size': 6})
+plt.grid()
 plt.savefig('bouss_stresses.eps')
 
-fig1,ax1 = plt.subplots()
-plt.plot(bouss_11[x_pos, :], y2d[x_pos, :])
-plt.plot(bouss_12[x_pos, :], y2d[x_pos, :])
-plt.plot(rey_stress_11[x_pos, :], y2d[x_pos, :])
-plt.plot(rey_stress_12[x_pos, :], y2d[x_pos, :])
-plt.plot(sum_terms_11[x_pos, :], y2d[x_pos, :])
-plt.plot(np.transpose(sum_terms_12), y2d[x_pos, :])
-plt.ylim([0,0.2])
-plt.xlim([-0.5,0.5])
-plt.ylabel("$y$")
-plt.title("Stresses", fontsize=15)
-plt.legend(['Bouss_11', 'Bouss_12', 'rey_stress_11', 'rey_stress_12', 'sum_terms_11', 'sum_terms_12'], prop={'size': 6})
-plt.savefig('bouss_stresses_zoom.eps')
+# fig1,ax1 = plt.subplots()
+# #plt.plot(bouss_stress_11[x_pos, :], y2d[x_pos, :])
+# #plt.plot(bouss_stress_12[x_pos, :], y2d[x_pos, :])
+# plt.plot(rey_stress_11[x_pos, :], y2d[x_pos, :])
+# plt.plot(rey_stress_12[x_pos, :], y2d[x_pos, :])
+# plt.plot(sum_terms_11[x_pos, :], y2d[x_pos, :])
+# plt.plot(np.transpose(sum_terms_12), y2d[x_pos, :])
+# plt.ylim([0,0.2])
+# plt.xlim([-0.5,0.5])
+# plt.ylabel("$y$")
+# plt.title("Stresses", fontsize=15)
+# plt.legend(['Bouss_11', 'Bouss_12', 'rey_stress_11', 'rey_stress_12', 'sum_terms_11', 'sum_terms_12'], prop={'size': 6})
+# plt.grid()
+# plt.savefig('bouss_stresses_zoom.eps')
 
 # 1.9:
 P_k = -np.add(np.add(np.multiply(uu2d, dudx), np.multiply(uv2d, dudy)), np.add(np.multiply(vv2d, dvdy), np.multiply(uv2d, dvdx)))
