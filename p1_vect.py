@@ -201,7 +201,6 @@ i = 1
 j = 2
 mu = 1/10595
 visc_diff_12 = mu*(np.add(duvdx_dx, duvdy_dy))
-P_12_temp = -np.add(np.add(np.multiply(uu2d, dvdx), np.multiply(uv2d, dvdy)), np.add(np.multiply(uv2d, dudx), np.multiply(vv2d, dudy)))
 P_12 = -(uu2d*dvdx + uv2d*dvdy) - (uv2d*dudx + vv2d*dudy)
 P_strain_12_2 = -C2*rho*P_12
 
